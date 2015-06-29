@@ -1,0 +1,10 @@
+.done-true {
+  text-decoration: line-through;
+  color: grey;
+}
+
+.delete{
+	color: grey;
+	font-size: 10pt;
+	font-style: italic;
+}
