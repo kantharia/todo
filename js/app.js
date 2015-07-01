@@ -11,6 +11,7 @@ angular.module('todoApp',[])
   .controller('TodoListController', function($scope,BuiltApp,todoData) {
 
   	$scope.todoList = [];
+  	$scope.preloader = true;
 
   	todoData
   		.then(function(data){
@@ -18,14 +19,16 @@ angular.module('todoApp',[])
   				data.forEach(function(todo){
   					$scope.todoList.push(todo);
   				});
-  				$scope.$apply();
+  				$scope.$apply(function(){
+  					$scope.preloader = false;
+  				});
   			}
   		});
 
   	/* Show number of incomplete todo in todoList */
   	$scope.remaining = function(){
   		return $scope.todoList.filter(function(todo){
-  			if(!todo.done){
+  			if(!todo.get('done')){
   				return todo;
   			}
   		}).length;
@@ -80,16 +83,21 @@ angular.module('todoApp',[])
 
   	/* Edit todo status */
   	$scope.editTodoStatus = function(todo,index){
-  		var index  = $scope.todoList.indexOf(todo); 
-  		$scope.updateTodo(todo, index);
+  		var index   = $scope.todoList.indexOf(todo);
+  		var newTodo = todo.set('done',todo.get('done'));
+  		$scope.updateTodo(newTodo, index);
   	}
 
   	/* Delete all completed todo */
   	$scope.deleteAllCompleted = function(){
-  		$scope.todoList = $scope.todoList.filter(function(todo){
-  			if(!todo.done){
-  				return todo;
-  			}
+  		var completedTodoUID = $scope.todoList.filter(function(todo){
+  			return todo.get('done') && todo.get('uid');
+  		}).map(function(todo){
+  			return todo.get('uid');
   		});
+
+  		if(completedTodoUID){
+  			console.log(completedTodoUID)
+  		}
   	}
   });

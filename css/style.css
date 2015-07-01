@@ -3,8 +3,43 @@
   color: grey;
 }
 
-.delete{
-	color: grey;
-	font-size: 10pt;
-	font-style: italic;
+span {display:inline-block;}
+
+.icon{
+	color: #CCCCCC;
+	font-size: 12pt;
+	cursor: pointer;
+}
+
+.rtl{
+  -webkit-transform:rotateY(180deg);
+  -moz-transform:rotateY(180deg);
+  -o-transform:rotateY(180deg);
+  -ms-transform:rotateY(180deg);
+	transform:rotateY(180deg);
+	unicode-bidi:bidi-override;
+	direction:rtl;
+}
+
+.unstyled{
+	list-style-type: none;
+}
+
+.share {
+    font-weight: bold;
+    position: relative;
+}
+.share:before {
+	content: ".";
+  font-size: 18pt;
+  position: absolute;
+  bottom: 1.6px;
+  left: -1px;
+}
+.share:after {
+  content: ":";
+  font-size: 18pt;
+  position: absolute;
+  bottom: -2px;
+  right: -5px;
 }
