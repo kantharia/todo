@@ -26,8 +26,8 @@ span {display:inline-block;}
 }
 
 .share {
-    font-weight: bold;
-    position: relative;
+  font-weight: bold;
+  position: relative;
 }
 .share:before {
 	content: ".";

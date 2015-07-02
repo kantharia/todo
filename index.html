@@ -18,7 +18,7 @@
 
 		<div ng-show="!preloader">
 	    <span>{{remaining()}} of {{todoList.length}} remaining</span> 
-	    [ <a href="" ng-click="deleteAllCompleted()">Clear Completed</a> ]
+	    [ <a href="" ng-click="deleteAllCompleted()">Delete Completed </a> ]
 	    <ul class="unstyled">
 	      <li ng-repeat="todo in todoList">
 	        <input type="checkbox" ng-model="todo.toJSON().done" ng-click="editTodoStatus(todo)">
