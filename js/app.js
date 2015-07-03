@@ -2,6 +2,10 @@
 angular.module('todoApp',[])
 	.constant('BuiltApp', Built.App('blta1d22ed99ebbf615'))
 	.factory('todoData', function(BuiltApp){
+		/* 
+			Initially Fetch All Todo Data From 
+			Built.IO Backend Using SDK Query 
+		*/
 		var builtQuery  = BuiltApp.Class('todos').Query();
 			return builtQuery.exec()
 					.then(function(objects){
@@ -11,16 +15,15 @@ angular.module('todoApp',[])
   .controller('TodoListController', function($scope,BuiltApp,todoData) {
 
   	$scope.todoList = [];
-  	$scope.preloader = true;
+  	$scope.preloader = true; //Show Loader Animation
 
+  	/* Populate todoList */
   	todoData
-  		.then(function(data){
-  			if(data){
-  				data.forEach(function(todo){
-  					$scope.todoList.push(todo);
-  				});
+  		.then(function(allTodoItems){
+  			if(allTodoItems){
+  				$scope.todoList = allTodoItems;
   				$scope.$apply(function(){
-  					$scope.preloader = false;
+  					$scope.preloader = false; //Hide Loader Animation
   				});
   			}
   		});
