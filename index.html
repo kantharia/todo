@@ -12,26 +12,31 @@
   <h2>Todo</h2>
   <div ng-controller="TodoListController">
   <hr>
-		<div ng-show="preloader">
-			<img src="image/preloader.gif" alt="">
-		</div>
 
+  	<!-- Show Preloader While Loading Data -->
+		<div ng-show="preloader">
+			<div>Loading...</div>
+		</div>
+	
+		<!-- While loading is completed show todo list -->
 		<div ng-show="!preloader">
-	    <span>{{remaining()}} of {{todoList.length}} remaining</span> 
-	    [ <a href="" ng-click="deleteAllCompleted()">Delete Completed </a> ]
-	    <ul class="unstyled">
-	      <li ng-repeat="todo in todoList">
-	        <input type="checkbox" ng-model="todo.toJSON().done" ng-click="editTodoStatus(todo)">
-	        <span class="done-{{todo.toJSON().done}}">{{todo.toJSON().text}}</span>
-	        <span class="icon" ng-click="removeTodo(todo)">&#10005;</span>
-	        <span class="icon" ng-click="editTodoText(todo)"><span class="rtl">&#x270E;</span></span>
-	        <span class="icon share">&lt;</span>
-	      </li>
-	    </ul>
+	    
+	    <!-- Form to create new todo -->
 	    <form ng-submit="addTodo()">
 	      <input type="text" ng-model="todoText"  size="30" placeholder="add new todo here">
 	      <input class="btn-primary" type="submit" value="add">
 	    </form>
+	
+			<!-- Todo list -->
+	    <ul class="unstyled">
+	      <li ng-repeat="todo in todoList">
+	        <input type="checkbox" ng-model="todo.toJSON().done" ng-click="editTodoStatus(todo)">
+	        <span class="done-{{todo.toJSON().done}}">{{todo.toJSON().text}}</span>
+	        <span class="action" ng-click="removeTodo(todo)">delete</span>
+	        <span class="action" ng-click="editTodoText(todo)">edit</span>
+	      </li>
+	    </ul>
+	    
 		</div>
   </div>
 </body>

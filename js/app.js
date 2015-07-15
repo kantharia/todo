@@ -8,9 +8,9 @@ angular.module('todoApp',[])
 		*/
 		var builtQuery  = BuiltApp.Class('todos').Query();
 			return builtQuery.exec()
-					.then(function(objects){
-						return objects;
-					})
+				.then(function(objects){
+					return objects;
+				})
 	})
   .controller('TodoListController', function($scope,BuiltApp,todoData) {
 
@@ -22,9 +22,9 @@ angular.module('todoApp',[])
   		.then(function(allTodoItems){
   			if(allTodoItems){
   				$scope.todoList = allTodoItems;
-  				$scope.$apply(function(){
-  					$scope.preloader = false; //Hide Loader Animation
-  				});
+          $sa($scope, function(){
+            $scope.preloader = false; //Hide Loader Animation
+          });
   			}
   		});
 
@@ -47,9 +47,10 @@ angular.module('todoApp',[])
   			.Object(todo)
 				.save()
 				.then(function(data){
-					$scope.todoList.push(data);
-					$scope.todoText = '';
-					$scope.$apply();
+          $sa($scope, function (){
+            $scope.todoList.push(data);
+            $scope.todoText = '';
+          });
 			});
   	}
 
@@ -60,8 +61,9 @@ angular.module('todoApp',[])
   		//Delete from Built.IO Backend
   		todo.delete()
 			.then(function(data){
-				$scope.todoList.splice(index,1);
-				$scope.$apply();
+        $sa($scope, function(){
+          $scope.todoList.splice(index,1);
+        })
 			});
   	}
 
@@ -70,8 +72,9 @@ angular.module('todoApp',[])
   		//Save updated `todo` to Built.IO Backend
 			updatedTodo.save()
 				.then(function(data){
-					$scope.todoList.splice(index,1,data);
-					$scope.$apply();
+          $sa($scope, function(){
+            $scope.todoList.splice(index,1,data);
+          })
   			});
   	}
 
@@ -86,8 +89,8 @@ angular.module('todoApp',[])
   	}
 
   	/* Edit todo status */
-  	$scope.editTodoStatus = function(todo,index){
-  		var index   = $scope.todoList.indexOf(todo);
+  	$scope.editTodoStatus = function(todo){
+      var index   = $scope.todoList.indexOf(todo);
   		var newTodo = todo.set('done',todo.get('done'));
   		$scope.updateTodo(newTodo, index);
   	}
@@ -112,12 +115,21 @@ angular.module('todoApp',[])
   			//Execute query to delete
   			query.delete()
   				.then(function(data){
-  					//On Success Update UI
-  					$scope.todoList = $scope.todoList.filter(function(todo){
-  						return !todo.get('done'); 
-  					})
-  					$scope.$apply();
+            $sa($scope, function(){
+    					//On Success Update UI
+    					$scope.todoList = $scope.todoList.filter(function(todo){
+    						return !todo.get('done'); 
+    					})
+            });
   				});
   		}
   	}
+
+    
+
   });
+
+// Safe apply
+function $sa(scope, fn) {
+  (scope.$$phase || scope.$root.$$phase) ? fn() : scope.$apply(fn);
+}

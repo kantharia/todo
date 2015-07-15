@@ -1,45 +1,20 @@
+span {display:inline-block;}
+
 .done-true {
   text-decoration: line-through;
   color: grey;
 }
 
-span {display:inline-block;}
-
-.icon{
+.action{
 	color: #CCCCCC;
-	font-size: 12pt;
+	font-size: 9pt;
 	cursor: pointer;
+  margin: 0px 3px 0px 3px;
 }
-
-.rtl{
-  -webkit-transform:rotateY(180deg);
-  -moz-transform:rotateY(180deg);
-  -o-transform:rotateY(180deg);
-  -ms-transform:rotateY(180deg);
-	transform:rotateY(180deg);
-	unicode-bidi:bidi-override;
-	direction:rtl;
+.action:hover{
+  color: #888888;
 }
 
 .unstyled{
 	list-style-type: none;
-}
-
-.share {
-  font-weight: bold;
-  position: relative;
-}
-.share:before {
-	content: ".";
-  font-size: 18pt;
-  position: absolute;
-  bottom: 1.6px;
-  left: -1px;
-}
-.share:after {
-  content: ":";
-  font-size: 18pt;
-  position: absolute;
-  bottom: -2px;
-  right: -5px;
 }
