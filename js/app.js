@@ -28,14 +28,6 @@ angular.module('todoApp',[])
   			}
   		});
 
-  	/* Show number of incomplete todo in todoList */
-  	$scope.remaining = function(){
-  		return $scope.todoList.filter(function(todo){
-  			if(!todo.get('done')){
-  				return todo;
-  			}
-  		}).length;
-  	};
 
   	/* Add new todo in todoList */
   	$scope.addTodo = function(){
