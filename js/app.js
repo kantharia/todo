@@ -95,38 +95,6 @@ angular.module('todoApp',[])
   		$scope.updateTodo(newTodo, index);
   	}
 
-  	/* Delete all completed todo */
-  	$scope.deleteAllCompleted = function(){
-
-  		// Populate `completedTodoUID` with UIDs of all task where property `done` is true
-  		var completedTodoUID = $scope.todoList.filter(function(todo){
-  			return todo.get('done');
-  		}).map(function(todo){
-  			return todo.get('uid');
-  		});
-
-  		// If `completedTodoUID` has value then delete those `todo` items
-  		if(completedTodoUID){
-  			//Init Delete Query 
-  			var Query = BuiltApp.Class('todos').Query;
-  			var query = Query();
-  					query = query.containedIn('uid',completedTodoUID);
-
-  			//Execute query to delete
-  			query.delete()
-  				.then(function(data){
-            $sa($scope, function(){
-    					//On Success Update UI
-    					$scope.todoList = $scope.todoList.filter(function(todo){
-    						return !todo.get('done'); 
-    					})
-            });
-  				});
-  		}
-  	}
-
-    
-
   });
 
 // Safe apply
