@@ -12,7 +12,7 @@ angular.module('todoApp',[])
 					return objects;
 				})
 	})
-  .controller('TodoListController', function($scope,BuiltApp,todoData) {
+  .controller('TodoListController', ['$scope', 'BuiltApp', 'todoData', function($scope,BuiltApp,todoData) {
 
   	$scope.todoList = [];
   	$scope.preloader = true; //Show Loader Animation
@@ -31,19 +31,32 @@ angular.module('todoApp',[])
 
   	/* Add new todo in todoList */
   	$scope.addTodo = function(){
-  		//create todo object
-  		var todo = {text:$scope.todoText, done:false};
   		
-  		//Save todo object to Built.io Backend
-  		BuiltApp.Class('todos')
-  			.Object(todo)
-				.save()
-				.then(function(data){
-          $sa($scope, function (){
-            $scope.todoList.push(data);
-            $scope.todoText = '';
-          });
-			});
+      /* 
+        Save todo object to Built.io Backend
+      */
+  		  
+        // BuiltApp.Class('class_name').Object returns a Object constructor
+        var Todo = BuiltApp.Class('todos').Object;
+
+        // `newTodo` is Object of `Todo` constructor
+        var newTodo = Todo({
+          text: $scope.todoText,
+          done: false
+        })
+
+        // `newTodo` save method create new Object in Built.IO Backend's `todos` Class
+        newTodo.save()
+          // save method return's a promise
+          .then(function(responseObj){
+            // On success `responseObj` return a Built.IO Backend's Object we just created
+            $sa($scope, function(){
+              // add `responseObj` to our `$scope.todoList`
+              $scope.todoList.push(responseObj);
+              // clear the input text on html form
+              $scope.todoText = '';
+            })
+          })
   	}
 
   	/* Delete todo from todoList */
@@ -59,10 +72,10 @@ angular.module('todoApp',[])
 			});
   	}
 
-  	/* Update todo and re-render */
-  	$scope.updateTodo = function(updatedTodo,index){
+  	/* Update todo */
+  	$scope.updateTodo = function(newTodo,index){ 
   		//Save updated `todo` to Built.IO Backend
-			updatedTodo.save()
+			newTodo.save()
 				.then(function(data){
           $sa($scope, function(){
             $scope.todoList.splice(index,1,data);
@@ -74,9 +87,9 @@ angular.module('todoApp',[])
   	$scope.editTodoText = function(todo){
   		var index = $scope.todoList.indexOf(todo);
   		var text 	= prompt("Todo Text", todo.get('text'));
-  		var updatedTodo = text && todo.set('text', text);
-  		if(updatedTodo){
-  			$scope.updateTodo(updatedTodo,index);
+  		var newTodo = text && todo.set('text', text);
+  		if(newTodo){
+  			$scope.updateTodo(newTodo,index);
   		}
   	}
 
@@ -87,9 +100,9 @@ angular.module('todoApp',[])
   		$scope.updateTodo(newTodo, index);
   	}
 
-  });
+  }]);
 
-// Safe apply
+// Safely apply changes
 function $sa(scope, fn) {
   (scope.$$phase || scope.$root.$$phase) ? fn() : scope.$apply(fn);
 }
