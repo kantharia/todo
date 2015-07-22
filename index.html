@@ -13,18 +13,18 @@
   <div ng-controller="TodoListController">
   <hr>
       <!-- Form to create new todo -->
-      <form >
-        <input type="text" size="30" placeholder="add new todo here">
+      <form ng-submit="addTask()">
+        <input type="text" ng-model="taskText" size="30" placeholder="add new todo here">
         <input class="btn-primary" type="submit" value="add">
       </form>
 
       <!-- Todo list -->
       <ul class="unstyled">
-        <li ng-repeat="todo in todoList">
-          <input type="checkbox" ng-model="todo.toJSON().done" ng-click="editTodoStatus(todo)">
-          <span class="done-{{todo.toJSON().done}}">{{todo.toJSON().text}}</span>
-          <span class="action" ng-click="removeTodo(todo)">delete</span>
-          <span class="action" ng-click="editTodoText(todo)">edit</span>
+        <li ng-repeat="task in taskList">
+          <input type="checkbox" ng-model="task.toJSON().task_status" ng-click="editTaskStatus(task)">
+          <span class="done-{{task.toJSON().task_status}}">{{task.toJSON().task_text}}</span>
+          <span class="action" ng-click="removeTask(task)">delete</span>
+          <span class="action" ng-click="editTaskText(task)">edit</span>
         </li>
       </ul>
   </div>

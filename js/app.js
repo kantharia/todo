@@ -5,16 +5,16 @@ var BuiltApp   = Built.App('blta1d22ed99ebbf615');
 angular.module('todoApp',[])
   .controller('TodoListController', function($scope) {
 
-    $scope.todoList = [];
+    $scope.taskList = [];
 
     /*
-      Populate `todoList`
+      Populate `taskList`
       ===================
       Fetch data from Built.io Backend's
     */
     
       // `BuiltClass` is an instance of Backend class. 
-      var BuiltClass = BuiltApp.Class('todos');
+      var BuiltClass = BuiltApp.Class('tasks');
 
       // `builtQuery` is an instance of Backend's Query.
       var builtQuery = BuiltClass.Query();
@@ -22,82 +22,84 @@ angular.module('todoApp',[])
       // Execute builtQuery
       builtQuery.exec()
         .then(function(objects){
-          console.log('objects', objects);
           $sa($scope, function(){
-            $scope.todoList = objects
+            $scope.taskList = objects
           });
         });
 
 
-    /* Add new todo in todoList */
-    $scope.addTodo = function(){
+    /* Add new task in taskList */
+    $scope.addTask = function(){
       
       /* 
-        Save todo object to Built.io Backend
+        Save task object to Built.io Backend
       */
         
         // BuiltApp.Class('class_name').Object returns a Object constructor
-        var Todo = BuiltApp.Class('todos').Object;
+        var Task = BuiltApp.Class('tasks').Object;
 
-        // `newTodo` is Object of `Todo` constructor
-        var newTodo = Todo({
-          text: $scope.todoText,
-          done: false
+        // `newTask` is Object of `Task` constructor
+        var newTask = Task({
+          task_text   : $scope.taskText,
+          task_status : false
         })
 
-        // `newTodo` save method create new Object in Built.IO Backend's `todos` Class
-        newTodo.save()
+        // `newTask` save method create new Object in Built.IO Backend's `tasks` Class
+        newTask.save()
           // save method return's a promise
           .then(function(responseObj){
+            console.log('responseObj', responseObj);
             // On success `responseObj` return a Built.IO Backend's Object we just created
             $sa($scope, function(){
               // add `responseObj` to our `$scope.todoList`
-              $scope.todoList.push(responseObj);
+              $scope.taskList.push(responseObj);
               // clear the input text on html form
-              $scope.todoText = '';
+              $scope.taskText = '';
             })
           })
     }
 
-    /* Delete todo from todoList */
-    $scope.removeTodo = function(todo){
-      //Get index number of todo
-      var index = $scope.todoList.indexOf(todo);
+    /* Delete task */
+    $scope.removeTask = function(task){
+      //Get index number of task
+      var index = $scope.taskList.indexOf(task);
       //Delete from Built.IO Backend
-      todo.delete()
-      .then(function(data){
+      task.delete()
+      .then(function(){
         $sa($scope, function(){
-          $scope.todoList.splice(index,1);
+          // Delete task from taskList
+          $scope.taskList.splice(index,1);
         })
       });
     }
 
-    /* Update todo */
-    $scope.updateTodo = function(newTodo,index){ 
-      //Save updated `todo` to Built.IO Backend
-      newTodo.save()
+    /* Update task */
+    $scope.updateTask = function(newTask,index){ 
+      //Save updated `task` to Built.IO Backend
+      newTask.save()
         .then(function(data){
           $sa($scope, function(){
-            $scope.todoList.splice(index,1,data);
+            $scope.taskList.splice(index,1,data);
           })
         });
     }
 
-    /* Edit todo text */
-    $scope.editTodoText = function(todo){
-      var index = $scope.todoList.indexOf(todo);
-      var text  = prompt("Todo Text", todo.get('text'));
-      var newTodo = text && todo.set('text', text);
-      if(newTodo){
-        $scope.updateTodo(newTodo,index);
+    /* Edit task text */
+    $scope.editTaskText = function(task){
+      var index   = $scope.taskList.indexOf(task);
+      var text    = prompt("Task Text", task.get('task_text'));
+      var newTask = text && task.set('task_text', text);
+      if(newTask){
+        $scope.updateTask(newTask,index);
       }
     }
 
-    /* Edit todo status */
-    $scope.editTodoStatus = function(todo){
-      var index   = $scope.todoList.indexOf(todo);
-      var newTodo = todo.set('done',todo.get('done'));
-      $scope.updateTodo(newTodo, index);
+    /* Edit task status */
+    $scope.editTaskStatus = function(task){
+      var index   = $scope.taskList.indexOf(task);
+      console.log('status', task.get('task_status'));
+      var newTask = task.set('task_status',task.get('task_status'));
+      $scope.updateTask(newTask, index);
     }
 
   });
