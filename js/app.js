@@ -1,12 +1,11 @@
 //Initialize Built.io Backend Application
 var BuiltApp   = Built.App('blta1d22ed99ebbf615');
 
-//Create AngularJS module
+//Create `todoApp` AngularJS module
 angular.module('todoApp',[])
   .controller('TodoListController', function($scope) {
 
-  	$scope.todoList = [];
-  	$scope.preloader = true; //Show Loader Animation
+    $scope.todoList = [];
 
     /*
       Populate `todoList`
@@ -26,18 +25,17 @@ angular.module('todoApp',[])
           console.log('objects', objects);
           $sa($scope, function(){
             $scope.todoList = objects
-            $scope.preloader = false;
           });
         });
 
 
-  	/* Add new todo in todoList */
-  	$scope.addTodo = function(){
-  		
+    /* Add new todo in todoList */
+    $scope.addTodo = function(){
+      
       /* 
         Save todo object to Built.io Backend
       */
-  		  
+        
         // BuiltApp.Class('class_name').Object returns a Object constructor
         var Todo = BuiltApp.Class('todos').Object;
 
@@ -59,48 +57,48 @@ angular.module('todoApp',[])
               $scope.todoText = '';
             })
           })
-  	}
+    }
 
-  	/* Delete todo from todoList */
-  	$scope.removeTodo = function(todo){
-  		//Get index number of todo
-  		var index = $scope.todoList.indexOf(todo);
-  		//Delete from Built.IO Backend
-  		todo.delete()
-			.then(function(data){
+    /* Delete todo from todoList */
+    $scope.removeTodo = function(todo){
+      //Get index number of todo
+      var index = $scope.todoList.indexOf(todo);
+      //Delete from Built.IO Backend
+      todo.delete()
+      .then(function(data){
         $sa($scope, function(){
           $scope.todoList.splice(index,1);
         })
-			});
-  	}
+      });
+    }
 
-  	/* Update todo */
-  	$scope.updateTodo = function(newTodo,index){ 
-  		//Save updated `todo` to Built.IO Backend
-			newTodo.save()
-				.then(function(data){
+    /* Update todo */
+    $scope.updateTodo = function(newTodo,index){ 
+      //Save updated `todo` to Built.IO Backend
+      newTodo.save()
+        .then(function(data){
           $sa($scope, function(){
             $scope.todoList.splice(index,1,data);
           })
-  			});
-  	}
+        });
+    }
 
-  	/* Edit todo text */
-  	$scope.editTodoText = function(todo){
-  		var index = $scope.todoList.indexOf(todo);
-  		var text 	= prompt("Todo Text", todo.get('text'));
-  		var newTodo = text && todo.set('text', text);
-  		if(newTodo){
-  			$scope.updateTodo(newTodo,index);
-  		}
-  	}
+    /* Edit todo text */
+    $scope.editTodoText = function(todo){
+      var index = $scope.todoList.indexOf(todo);
+      var text  = prompt("Todo Text", todo.get('text'));
+      var newTodo = text && todo.set('text', text);
+      if(newTodo){
+        $scope.updateTodo(newTodo,index);
+      }
+    }
 
-  	/* Edit todo status */
-  	$scope.editTodoStatus = function(todo){
+    /* Edit todo status */
+    $scope.editTodoStatus = function(todo){
       var index   = $scope.todoList.indexOf(todo);
-  		var newTodo = todo.set('done',todo.get('done'));
-  		$scope.updateTodo(newTodo, index);
-  	}
+      var newTodo = todo.set('done',todo.get('done'));
+      $scope.updateTodo(newTodo, index);
+    }
 
   });
 

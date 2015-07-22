@@ -1,43 +1,32 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="todoApp">
 <head>
-	<meta charset="UTF-8">
-	<title>Todo</title>
-	<script type="text/javascript" src="js/built.min.js"></script>
-	<script type="text/javascript" src="js/angular.min.js"></script>
-	<script type="text/javascript" src="js/app.js"></script>
-	<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <title>Todo</title>
+  <script type="text/javascript" src="js/built.min.js"></script>
+  <script type="text/javascript" src="js/angular.min.js"></script>
+  <script type="text/javascript" src="js/app.js"></script>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <h2>Todo</h2>
   <div ng-controller="TodoListController">
   <hr>
+      <!-- Form to create new todo -->
+      <form >
+        <input type="text" size="30" placeholder="add new todo here">
+        <input class="btn-primary" type="submit" value="add">
+      </form>
 
-  	<!-- Show Preloader While Loading Data -->
-		<div ng-show="preloader">
-			<div>Loading...</div>
-		</div>
-	
-		<!-- While loading is completed show todo list -->
-		<div ng-show="!preloader">
-	    
-	    <!-- Form to create new todo -->
-	    <form ng-submit="addTodo()">
-	      <input type="text" ng-model="todoText"  size="30" placeholder="add new todo here">
-	      <input class="btn-primary" type="submit" value="add">
-	    </form>
-	
-			<!-- Todo list -->
-	    <ul class="unstyled">
-	      <li ng-repeat="todo in todoList">
-	        <input type="checkbox" ng-model="todo.toJSON().done" ng-click="editTodoStatus(todo)">
-	        <span class="done-{{todo.toJSON().done}}">{{todo.toJSON().text}}</span>
-	        <span class="action" ng-click="removeTodo(todo)">delete</span>
-	        <span class="action" ng-click="editTodoText(todo)">edit</span>
-	      </li>
-	    </ul>
-	    
-		</div>
+      <!-- Todo list -->
+      <ul class="unstyled">
+        <li ng-repeat="todo in todoList">
+          <input type="checkbox" ng-model="todo.toJSON().done" ng-click="editTodoStatus(todo)">
+          <span class="done-{{todo.toJSON().done}}">{{todo.toJSON().text}}</span>
+          <span class="action" ng-click="removeTodo(todo)">delete</span>
+          <span class="action" ng-click="editTodoText(todo)">edit</span>
+        </li>
+      </ul>
   </div>
 </body>
 </html>
