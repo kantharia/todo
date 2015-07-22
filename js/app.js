@@ -1,32 +1,34 @@
-//APP
+//Initialize Built.io Backend Application
+var BuiltApp   = Built.App('blta1d22ed99ebbf615');
+
+//Create AngularJS module
 angular.module('todoApp',[])
-	.constant('BuiltApp', Built.App('blta1d22ed99ebbf615'))
-	.factory('todoData', function(BuiltApp){
-		/* 
-			Initially Fetch All Todo Data From 
-			Built.IO Backend Using SDK Query 
-		*/
-		var builtQuery  = BuiltApp.Class('todos').Query();
-			return builtQuery.exec()
-				.then(function(objects){
-					return objects;
-				})
-	})
-  .controller('TodoListController', ['$scope', 'BuiltApp', 'todoData', function($scope,BuiltApp,todoData) {
+  .controller('TodoListController', function($scope) {
 
   	$scope.todoList = [];
   	$scope.preloader = true; //Show Loader Animation
 
-  	/* Populate todoList */
-  	todoData
-  		.then(function(allTodoItems){
-  			if(allTodoItems){
-  				$scope.todoList = allTodoItems;
+    /*
+      Populate `todoList`
+      ===================
+      Fetch data from Built.io Backend's
+    */
+    
+      // `BuiltClass` is an instance of Backend class. 
+      var BuiltClass = BuiltApp.Class('todos');
+
+      // `builtQuery` is an instance of Backend's Query.
+      var builtQuery = BuiltClass.Query();
+
+      // Execute builtQuery
+      builtQuery.exec()
+        .then(function(objects){
+          console.log('objects', objects);
           $sa($scope, function(){
-            $scope.preloader = false; //Hide Loader Animation
+            $scope.todoList = objects
+            $scope.preloader = false;
           });
-  			}
-  		});
+        });
 
 
   	/* Add new todo in todoList */
@@ -100,7 +102,7 @@ angular.module('todoApp',[])
   		$scope.updateTodo(newTodo, index);
   	}
 
-  }]);
+  });
 
 // Safely apply changes
 function $sa(scope, fn) {
