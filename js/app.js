@@ -1,8 +1,23 @@
 //Initialize Built.io Backend Application
 var BuiltApp   = Built.App('blta1d22ed99ebbf615');
 
-//Create `todoApp` AngularJS module
-angular.module('todoApp',[])
+//Create `todoApp` AngularJS module added `ngRoute` as dependency
+angular.module('todoApp',['ngRoute'])
+  .config(['$routeProvider','$locationProvider', function($routeProvider, $locationProvider){
+    $routeProvider
+      .when('/', {
+        templateUrl : 'template/sign-in.html',
+        controller  : 'SignInController'
+      })
+      .when('/sign-up', {
+        templateUrl : 'template/sign-up.html',
+        controller  : 'SignUpController'
+      })
+      .when('/todo', {
+        templateUrl : 'template/todo.html',
+        controller  : 'TodoListController'
+      })
+  }])
   .controller('TodoListController', function($scope) {
 
     $scope.taskList = [];
@@ -101,8 +116,68 @@ angular.module('todoApp',[])
       var newTask = task.set('task_status',task.get('task_status'));
       $scope.updateTask(newTask, index);
     }
+  })
+  .controller('SignInController', function($scope, $location, $rootScope){
+    /* Redirect to `todo` route when user is present */
+    if ($scope.user){
+      return $location.path('/todo');
+    }
 
-  });
+    /*
+      User Sign-In method
+    */
+    $scope.signIn = function(){
+      /* Create a `user` instance from SDK User constructor */
+      var user = BuiltApp.User();
+
+      /* Built.io Backend - login method */
+      user.login($scope.email, $scope.password)
+        .then(function(data){
+          /* 
+            Set user on rootscope so It can be accessible to other controller 
+          */
+          $rootScope.setUser(data.toJSON());
+
+          /*
+            If user logs in successfully redirect to `/todo` route
+          */
+          $sa($scope, function(){
+            $location.path('/todo');
+          })
+
+        }, function(error){
+          /*
+            If user log-in fails set `$scope.signInStatus`
+            This is show error message on log-in route.
+          */
+          $sa($scope, function(){
+            $scope.signInStatus = {"status": false, "message" : "Sign-In failed."}
+          })
+        });
+    }
+  })
+  .controller('SignUpController', function($scope){
+    console.log('SIGN UP')
+    /* Built.IO Backend Application User Sign-Up/Register */
+    $scope.signUp = function(){
+      /* Create `user` Object */
+      var user = BuiltApp.User();
+      /* User Registeration */
+      user.register($scope.email, $scope.password1, $scope.password2)
+        .then(function(data){
+          console.log('Data', data);
+          /* Clear Form Elements */
+          $sa($scope, function(){
+            $scope.email = "";
+            $scope.password1 = "";
+            $scope.password2 = "";
+          })
+        }, function(err){
+          console.log('Error',err);
+        })
+    }
+  })
+
 
 // Safely apply changes
 function $sa(scope, fn) {
