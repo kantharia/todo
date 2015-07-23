@@ -18,8 +18,7 @@ angular.module('todoApp',['ngRoute'])
         controller  : 'TodoListController'
       })
   }])
-  .controller('TodoListController', function($scope) {
-
+  .controller('TodoListController', function($scope, $rootScope, $location, $timeout) {
     $scope.taskList = [];
 
     /*
@@ -34,14 +33,28 @@ angular.module('todoApp',['ngRoute'])
       // `builtQuery` is an instance of Backend's Query.
       var builtQuery = BuiltClass.Query();
 
-      // Execute builtQuery
-      builtQuery.exec()
-        .then(function(objects){
-          $sa($scope, function(){
-            $scope.taskList = objects
-          });
+      /* 
+        First get current user 
+        and then execute builtQuery 
+      */
+      BuiltApp.User.getCurrentUser()
+        .then(function(user){
+          var uid = user.toJSON().uid;
+          builtQuery = builtQuery.where('app_user_object_uid', uid);
+          builtQuery
+            .exec()
+            .then(function(data){
+              $sa($scope, function(){
+               /* Populate taskList */
+                $scope.taskList = data;
+              });
+            })
+        }, function(){
+          /* If current user is null, redirect to '/' sign-in route */
+          $timeout(function(){
+            $location.path('/')
+          },0);
         });
-
 
     /* Add new task in taskList */
     $scope.addTask = function(){
@@ -177,7 +190,54 @@ angular.module('todoApp',['ngRoute'])
         })
     }
   })
+  .run(['$rootScope','$location', function($rootScope, $location){
+      /* Set User on a `$rootScope` */
+      $rootScope.setUser = function(user){
+        console.log('setUser', user);
+        $rootScope.user = user;
+      }
 
+      /* Delete User Information */
+      $rootScope.clearUser = function(){
+        delete $rootScope.user;
+      }
+
+      /* 
+        Logout current user and redirect to `/` route 
+      */
+      $rootScope.logout = function(){
+          BuiltApp.User.getCurrentUser()
+            .then(function(user){
+              return user.logout();
+            })
+            .then(function(res){
+              BuiltApp.User.clearSession;
+              $sa($rootScope, function() {
+                $rootScope.clearUser();
+                $location.path('/');
+              });
+            }, function (err){
+              console.log('Error : ', err);
+              $sa($rootScope, function() {
+                $rootScope.clearUser();
+                $location.path('/');
+              });
+            });
+      }
+
+      /*
+        If current user is present redirect to `/profile` route
+      */
+      BuiltApp.User.getCurrentUser()
+        .then(function(data){
+          $sa($rootScope, function(){
+            $rootScope.setUser(data.toJSON());
+            $location.path('/todo');
+          });
+        }, function(error){
+          console.log('Please Login Again.');
+        });
+  }])
 
 // Safely apply changes
 function $sa(scope, fn) {
