@@ -5,28 +5,14 @@
   <title>Todo</title>
   <script type="text/javascript" src="js/built.min.js"></script>
   <script type="text/javascript" src="js/angular.min.js"></script>
+  <script type="text/javascript" src="js/angular-route.min.js"></script>
   <script type="text/javascript" src="js/app.js"></script>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <h2>Todo</h2>
-  <div ng-controller="TodoListController">
   <hr>
-      <!-- Form to create new todo -->
-      <form ng-submit="addTask()">
-        <input type="text" ng-model="taskText" size="30" placeholder="add new todo here">
-        <input class="btn-primary" type="submit" value="add">
-      </form>
-
-      <!-- Todo list -->
-      <ul class="unstyled">
-        <li ng-repeat="task in taskList">
-          <input type="checkbox" ng-model="task.toJSON().task_status" ng-click="editTaskStatus(task)">
-          <span class="done-{{task.toJSON().task_status}}">{{task.toJSON().task_text}}</span>
-          <span class="action" ng-click="removeTask(task)">delete</span>
-          <span class="action" ng-click="editTaskText(task)">edit</span>
-        </li>
-      </ul>
-  </div>
+  <!-- Rendering Tempalte -->
+  <div ng-view></div>
 </body>
 </html>
