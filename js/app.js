@@ -17,6 +17,10 @@ angular.module('todoApp',['ngRoute'])
         templateUrl : 'template/todo.html',
         controller  : 'TodoListController'
       })
+      .when('/google_login', {
+        templateUrl : 'template/google-login.html',
+        controller  : 'GoogleLoginController'
+      })
   }])
   .controller('TodoListController', function($scope, $rootScope, $location, $timeout) {
     $scope.taskList = [];
@@ -168,6 +172,34 @@ angular.module('todoApp',['ngRoute'])
           })
         });
     }
+
+    /*
+      Sign-in user with Google
+    */
+    $scope.signInWithGoogle = function(){
+      //
+      var e = function(u) {return encodeURIComponent(u);}
+      var base = 'https://accounts.google.com/o/oauth2/auth';
+      var response_type = e('token');
+      var client_id = e('322741339463-m02mbf2ikp9oc9bb930lh8h70hq8s4k0.apps.googleusercontent.com');
+      var redirect_uri = e(document.URL.split("/#")[0] + '/google_oauth_callback.html');
+      var scope = e('https://www.googleapis.com/auth/userinfo.email');
+      var state = e('lollalal');
+      var approval_prompt = e('auto');
+      var hd = 'raweng.com';
+
+      base = base +
+        '?response_type=' + response_type +
+        '&client_id=' + client_id +
+        '&redirect_uri=' + redirect_uri +
+        '&scope=' + scope +
+        '&state=' + state +
+        '&approval_prompt=' + approval_prompt; 
+        // + '&hd=' + hd;
+
+      window.location.href = base;
+      return false;
+    }
   })  
   .controller('SignUpController', function($scope){
     /* Built.IO Backend Application User Sign-Up/Register */
@@ -188,6 +220,28 @@ angular.module('todoApp',['ngRoute'])
           console.log('Error',err);
         })
     }
+  })
+  .controller('GoogleLoginController', function($scope,$routeParams, $rootScope, $location){
+    /* Get token from Query Params */
+    var google_token = $routeParams.google_token;
+
+
+    var user = BuiltApp.User();
+    
+    /*
+      SDK method accepts google auth token
+    */
+    user.loginWithGoogle(google_token)
+      .then(function(user){
+        $rootScope.setUser(user.toJSON());
+        $sa($scope, function(){
+          $location.path('/todo');
+        })
+      }, function(error){
+        $sa($scope, function(){
+          $scope.signInStatus = {"status": false, "message" : "Sign-In with Google failed."}
+        })
+      })
   })
   .run(['$rootScope','$location', function($rootScope, $location){
       /* Set User on a `$rootScope` */
