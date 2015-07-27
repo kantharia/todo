@@ -168,9 +168,8 @@ angular.module('todoApp',['ngRoute'])
           })
         });
     }
-  })
+  })  
   .controller('SignUpController', function($scope){
-    console.log('SIGN UP')
     /* Built.IO Backend Application User Sign-Up/Register */
     $scope.signUp = function(){
       /* Create `user` Object */
