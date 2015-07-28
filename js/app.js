@@ -173,11 +173,10 @@ angular.module('todoApp',['ngRoute'])
         });
     }
 
-
     /*
       Sign-in user with Google
     */
-     $scope.signInWithGoogle = function(){
+    $scope.signInWithGoogle = function(){
       //
       var e = function(u) {return encodeURIComponent(u);}
       var base = 'https://accounts.google.com/o/oauth2/auth';
@@ -185,9 +184,10 @@ angular.module('todoApp',['ngRoute'])
       var client_id = e('322741339463-m02mbf2ikp9oc9bb930lh8h70hq8s4k0.apps.googleusercontent.com');
       var redirect_uri = e(document.URL.split("/#")[0] + '/google_oauth_callback.html');
       var scope = e('https://www.googleapis.com/auth/userinfo.email');
+      var state = e('lollalal');
       var approval_prompt = e('auto');
-      var state = ''
-      
+      var hd = 'raweng.com';
+
       base = base +
         '?response_type=' + response_type +
         '&client_id=' + client_id +
@@ -195,13 +195,13 @@ angular.module('todoApp',['ngRoute'])
         '&scope=' + scope +
         '&state=' + state +
         '&approval_prompt=' + approval_prompt; 
-        
+        // + '&hd=' + hd;
+
       window.location.href = base;
-       return false;
-      }
-  })
+      return false;
+    }
+  })  
   .controller('SignUpController', function($scope){
-    console.log('SIGN UP')
     /* Built.IO Backend Application User Sign-Up/Register */
     $scope.signUp = function(){
       /* Create `user` Object */
@@ -225,6 +225,7 @@ angular.module('todoApp',['ngRoute'])
     /* Get token from Query Params */
     var google_token = $routeParams.google_token;
 
+
     var user = BuiltApp.User();
     
     /*
@@ -234,6 +235,8 @@ angular.module('todoApp',['ngRoute'])
       .then(function(user){
         $rootScope.setUser(user.toJSON());
         $sa($scope, function(){
+          console.log('Redirect', $location)
+          $location.search(''); // Clears query params
           $location.path('/todo');
         })
       }, function(error){
