@@ -235,7 +235,6 @@ angular.module('todoApp',['ngRoute'])
       .then(function(user){
         $rootScope.setUser(user.toJSON());
         $sa($scope, function(){
-          console.log('Redirect', $location)
           $location.search(''); // Clears query params
           $location.path('/todo');
         })
