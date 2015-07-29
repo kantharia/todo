@@ -18,3 +18,9 @@ span {display:inline-block;}
 .unstyled{
 	list-style-type: none;
 }
+
+.collaboration{
+	background: #EEEEEE;
+	width: 350px;
+	padding: 5px;
+}

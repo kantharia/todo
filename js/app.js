@@ -25,7 +25,9 @@ angular.module('todoApp',['ngRoute'])
   }])
   .controller('TodoListController', function($scope, $rootScope, $location, $timeout) {
     $scope.taskList = [];
-
+    $scope.collaborator = {
+      email : ""
+    }
     /*
       Populate `taskList`
       ===================
@@ -134,6 +136,55 @@ angular.module('todoApp',['ngRoute'])
       var newTask = task.set('task_status',task.get('task_status'));
       $scope.updateTask(newTask, index);
     }
+
+    /* Show Collaboration Box */
+    $scope.showCollaborationBox = function(task){
+
+      /* 
+        Clear add collaborator form
+      */
+        $scope.collaborator.email = "";
+        $scope.taskList.forEach(function(task){
+          delete task.showCollaborationBox;
+        })
+
+      var index = $scope.taskList.indexOf(task);
+      if($scope.taskList[index].showCollaborationBox){
+        $scope.taskList[index].showCollaborationBox = false;
+      } else {
+        $scope.taskList[index].showCollaborationBox = true;
+      }
+    }
+
+    /* Add New Collaborator */
+    $scope.addCollaborator = function(task){
+      /*
+        console.log('task',task);
+        console.log('task',$scope.collaborator);
+      */
+
+      /*
+        Todo
+        1. Get user from email.
+        2. Add user to Object ACL remove with delete permission to false
+      */
+      var collaboratorEmail = $scope.collaborator.email;
+
+      if(collaboratorEmail){
+        var user    = BuiltApp.User();
+        var userUID = "";
+        
+        user.fetchUserUidByEmail(collaboratorEmail)
+          .then(function(userObject){
+            console.log('User Object', userObject.get('uid'));
+            
+          }, function(error){
+            console.log('Error', error);
+          })
+      }
+
+    }
+
   })
   .controller('SignInController', function($scope, $location, $rootScope){
     /* Redirect to `todo` route when user is present */

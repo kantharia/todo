@@ -15,6 +15,16 @@
       <span class="done-{{task.toJSON().task_status}}">{{task.toJSON().task_text}}</span>
       <span class="action" ng-click="removeTask(task)">delete</span>
       <span class="action" ng-click="editTaskText(task)">edit</span>
+      <span class="action" ng-click="showCollaborationBox(task)">share</span>
+      <div class="collaboration" ng-show="task.showCollaborationBox">
+        <form ng-submit="addCollaborator(task)">
+          Share Task With
+          <input type="text" ng-model="collaborator.email" placeholder="Email ID of Collaborator"> 
+          <button class="btn-small" type="submit">+</button>
+        </form>
+      </div>
     </li>
+    <div>
+    </div>
   </ul>
 </div>
