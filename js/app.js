@@ -1,5 +1,6 @@
 //Initialize Built.io Backend Application
-var BuiltApp   = Built.App('blta1d22ed99ebbf615');
+var BuiltApp       = Built.App('blta1d22ed99ebbf615');
+var EmployeeRoleID = 'blt49721667201bcec6';
 
 //Create `todoApp` AngularJS module added `ngRoute` as dependency
 angular.module('todoApp',['ngRoute'])
@@ -211,8 +212,7 @@ angular.module('todoApp',['ngRoute'])
         .then(function(user){
 
           /* Add current user to role */
-          var roleUID = 'blt49721667201bcec6';
-          $rootScope.addUserToRole(roleUID, user.get('uid'));
+          $rootScope.addUserToRole(EmployeeRoleID, user.get('uid'));
 
           /* Clear Form Elements */
           $sa($scope, function(){
@@ -239,8 +239,7 @@ angular.module('todoApp',['ngRoute'])
       .then(function(user){
 
         /* Add current user to role */
-        var roleUID = 'blt49721667201bcec6';
-        $rootScope.addUserToRole(roleUID, user.get('uid'));
+        $rootScope.addUserToRole(EmployeeRoleID, user.get('uid'));
 
         $rootScope.setUser(user.toJSON());
         $sa($scope, function(){
