@@ -297,7 +297,6 @@ angular.module('todoApp',['ngRoute'])
 
         /* 
           Fetch all exsisting users uid from role 
-          add the current user uid and save
         */
         role
          .fetch()
@@ -306,6 +305,9 @@ angular.module('todoApp',['ngRoute'])
             roleUsers = data.get('users');
             roleUsers.push(userUID);
 
+        /*
+          Add the current user uid to Role
+        */
             role
               .addUsers(roleUsers)
               .save()
