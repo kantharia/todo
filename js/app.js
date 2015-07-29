@@ -173,7 +173,6 @@ angular.module('todoApp',['ngRoute'])
         });
     }
 
-
     /*
       Sign-in user with Google
     */
@@ -202,15 +201,19 @@ angular.module('todoApp',['ngRoute'])
       return false;
     }
   })  
-  .controller('SignUpController', function($scope){
+  .controller('SignUpController', function($scope, $rootScope){
     /* Built.IO Backend Application User Sign-Up/Register */
     $scope.signUp = function(){
       /* Create `user` Object */
       var user = BuiltApp.User();
       /* User Registeration */
       user.register($scope.email, $scope.password1, $scope.password2)
-        .then(function(data){
-          console.log('Data', data);
+        .then(function(user){
+
+          /* Add current user to role */
+          var roleUID = 'blt49721667201bcec6';
+          $rootScope.addUserToRole(roleUID, user.get('uid'));
+
           /* Clear Form Elements */
           $sa($scope, function(){
             $scope.email = "";
@@ -226,6 +229,7 @@ angular.module('todoApp',['ngRoute'])
     /* Get token from Query Params */
     var google_token = $routeParams.google_token;
 
+
     var user = BuiltApp.User();
     
     /*
@@ -233,8 +237,14 @@ angular.module('todoApp',['ngRoute'])
     */
     user.loginWithGoogle(google_token)
       .then(function(user){
+
+        /* Add current user to role */
+        var roleUID = 'blt49721667201bcec6';
+        $rootScope.addUserToRole(roleUID, user.get('uid'));
+
         $rootScope.setUser(user.toJSON());
         $sa($scope, function(){
+          $location.search(''); // Clears query params
           $location.path('/todo');
         })
       }, function(error){
@@ -276,6 +286,34 @@ angular.module('todoApp',['ngRoute'])
                 $location.path('/');
               });
             });
+      }
+
+      /*
+        Add user to role
+      */
+      $rootScope.addUserToRole = function(roleUID, userUID){
+        //Create a `Role`
+        var role      = BuiltApp.Role(roleUID);
+        var roleUsers = [];
+
+        /* 
+          Fetch all exsisting users uid from role 
+          add the current user uid and save
+        */
+        role
+         .fetch()
+          .then(function(data){
+            console.log('Fetch Roles',data)
+            roleUsers = data.get('users');
+            roleUsers.push(userUID);
+
+            role
+              .addUsers(roleUsers)
+              .save()
+              .then(function(data){
+                console.log('MyData',data);
+              })
+          });
       }
 
       /*
