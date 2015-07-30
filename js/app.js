@@ -203,10 +203,8 @@ angular.module('todoApp',['ngRoute'])
         user.fetchUserUidByEmail(collaboratorEmail)
           .then(function(userObject){
             console.log('userObject', userObject);
-            var userEmail = userObject.get('email');
-
-            if(userEmail){
-              userUID = userObject.get('uid');
+            
+            userUID = userObject.get('uid');
 
               /* 
                 Create instance of Built ACL
@@ -229,9 +227,7 @@ angular.module('todoApp',['ngRoute'])
                 }, function(error){
                   console.log('Error', error);
                 })
-            } else {
-              throw new Error('User doesnt exsist');
-            }
+            
 
           }, function(error){
             console.log('Error', error);
