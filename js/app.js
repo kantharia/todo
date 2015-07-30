@@ -137,8 +137,45 @@ angular.module('todoApp',['ngRoute'])
       $scope.updateTask(newTask, index);
     }
 
+    /***********************************************
+    * Share a Task with other users (collaborators)
+    ***********************************************/
+
     /* Show Collaboration Box */
     $scope.showCollaborationBox = function(task){
+      /*
+        Fecth Collaborators Object
+      */
+      var index         = $scope.taskList.indexOf(task);
+      var collaborators = task.get('ACL').users;
+      
+      if(collaborators){
+        
+        // Create array of uid's of Collaborator
+        collaborators = task.get('ACL').users.map(function(user){
+          return user.uid;
+        })
+
+        if(collaborators.length > 0){
+
+          /* 
+            Create a query instance which will Query to System Class `built_io_application_user`
+            to get collaborators user object
+          */
+          var queryGetCollaborators = BuiltApp.Class('built_io_application_user').Query();
+              queryGetCollaborators
+                .containedIn('uid',collaborators)
+                .exec()
+                .then(function(data){
+                  task.collaborators = data;
+                  $sa($scope, function(){
+                    $scope.taskList.splice(index,1,task);
+                  })
+              });  
+        }
+        console.log('collaborators', $scope.taskList);
+      }
+
 
       /* 
         Clear add collaborator form
@@ -148,26 +185,15 @@ angular.module('todoApp',['ngRoute'])
           delete task.showCollaborationBox;
         })
 
-      var index = $scope.taskList.indexOf(task);
-      if($scope.taskList[index].showCollaborationBox){
-        $scope.taskList[index].showCollaborationBox = false;
-      } else {
-        $scope.taskList[index].showCollaborationBox = true;
-      }
+        if($scope.taskList[index].showCollaborationBox){
+          $scope.taskList[index].showCollaborationBox = false;
+        } else {
+          $scope.taskList[index].showCollaborationBox = true;
+        }
     }
 
     /* Add New Collaborator */
     $scope.addCollaborator = function(task){
-      /*
-        console.log('task',task);
-        console.log('task',$scope.collaborator);
-      */
-
-      /*
-        Todo
-        1. Get user from email.
-        2. Add user to Object ACL remove with delete permission to false
-      */
       var collaboratorEmail = $scope.collaborator.email;
 
       if(collaboratorEmail){
@@ -176,13 +202,62 @@ angular.module('todoApp',['ngRoute'])
         
         user.fetchUserUidByEmail(collaboratorEmail)
           .then(function(userObject){
-            console.log('User Object', userObject.get('uid'));
-            
+            console.log('userObject', userObject);
+            var userEmail = userObject.get('email');
+
+            if(userEmail){
+              userUID = userObject.get('uid');
+
+              /* 
+                Create instance of Built ACL
+                and set READ, UPDATE and DELETE permission to true
+              */
+              var acl = Built.ACL();
+                  acl = acl.setUserReadAccess(userUID, true);
+                  acl = acl.setUserUpdateAccess(userUID, true);
+                  acl = acl.setUserDeleteAccess(userUID, true);
+
+              /*
+                Apply ACL on a TASK and Save to Backend.
+              */
+              task = task.setACL(acl);
+              
+              task
+                .save()
+                .then(function(task){
+                  console.log('New Task With ACL', task);
+                }, function(error){
+                  console.log('Error', error);
+                })
+            } else {
+              throw new Error('User doesnt exsist');
+            }
+
           }, function(error){
             console.log('Error', error);
           })
+          .catch(function(data){
+            $sa($scope, function(){
+              $scope.collaborator.email = "";
+            })
+            alert(data);
+          })
       }
+    }
 
+    /* Remove Collaborator */
+    $scope.removeCollaborator = function(task, collaborator){
+      var taskIndex = $scope.taskList.indexOf(task);
+
+      task.get('ACL').users = task.get('ACL').users
+                                  .filter(function(user){
+                                    if(user.uid !== collaborator.get('uid')){
+                                      return user
+                                    }
+                                  });
+
+      var collaboratorIndex = task.get('ACL').users.indexOf(collaborator); 
+      console.log('Remove Collaborator', taskIndex, collaboratorIndex);
     }
 
   })
@@ -279,7 +354,6 @@ angular.module('todoApp',['ngRoute'])
   .controller('GoogleLoginController', function($scope,$routeParams, $rootScope, $location){
     /* Get token from Query Params */
     var google_token = $routeParams.google_token;
-
 
     var user = BuiltApp.User();
     
