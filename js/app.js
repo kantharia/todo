@@ -194,17 +194,18 @@ angular.module('todoApp',['ngRoute'])
 
     /* Add New Collaborator */
     $scope.addCollaborator = function(task){
+      var index = $scope.taskList.indexOf(task);
       var collaboratorEmail = $scope.collaborator.email;
 
       if(collaboratorEmail){
         var user    = BuiltApp.User();
         var userUID = "";
+        var taskACL = undefined;
         
         user.fetchUserUidByEmail(collaboratorEmail)
           .then(function(userObject){
-            console.log('userObject', userObject);
-            
-            userUID = userObject.get('uid');
+
+            userUID = userObject.get('uid');              
 
               /* 
                 Create instance of Built ACL
@@ -215,6 +216,15 @@ angular.module('todoApp',['ngRoute'])
                   acl = acl.setUserUpdateAccess(userUID, true);
                   acl = acl.setUserDeleteAccess(userUID, true);
 
+              /* 
+                Get ACL of the object and push it in new acl instance 
+              */
+              if(task.get('ACL').users){
+                task.get('ACL').users.forEach(function(user){
+                  acl.data.users.push(user)
+                })
+              }
+              
               /*
                 Apply ACL on a TASK and Save to Backend.
               */
@@ -223,37 +233,24 @@ angular.module('todoApp',['ngRoute'])
               task
                 .save()
                 .then(function(task){
+                  $sa($scope, function(){
+                    $scope.taskList.splice(index, 1, task);
+                  })
                   console.log('New Task With ACL', task);
                 }, function(error){
                   console.log('Error', error);
                 })
-            
 
           }, function(error){
             console.log('Error', error);
-          })
-          .catch(function(data){
-            $sa($scope, function(){
-              $scope.collaborator.email = "";
-            })
-            alert(data);
           })
       }
     }
 
     /* Remove Collaborator */
     $scope.removeCollaborator = function(task, collaborator){
-      var taskIndex = $scope.taskList.indexOf(task);
-
-      task.get('ACL').users = task.get('ACL').users
-                                  .filter(function(user){
-                                    if(user.uid !== collaborator.get('uid')){
-                                      return user
-                                    }
-                                  });
-
-      var collaboratorIndex = task.get('ACL').users.indexOf(collaborator); 
-      console.log('Remove Collaborator', taskIndex, collaboratorIndex);
+      console.log('Task',task);
+      console.log('Collaborator', collaborator.get('uid'));
     }
 
   })
