@@ -153,7 +153,10 @@ angular.module('todoApp',['ngRoute'])
         
         // Create array of uid's of Collaborator
         collaborators = task.get('ACL').users.map(function(user){
-          return user.uid;
+          //check if user has permission to read, update and delete
+          if(user.delete && user.read && user.update){
+            return user.uid;
+          }
         })
 
         if(collaborators.length > 0){
@@ -249,8 +252,44 @@ angular.module('todoApp',['ngRoute'])
 
     /* Remove Collaborator */
     $scope.removeCollaborator = function(task, collaborator){
-      console.log('Task',task);
-      console.log('Collaborator', collaborator.get('uid'));
+      var index = $scope.taskList.indexOf(task);
+
+      /* Get array of all users in ACL and remove current collaborator */
+      var aclUsers = task.get('ACL').users.filter(function(user){
+        if(user.uid !== collaborator.get('uid')){
+          return user.uid;
+        }
+      }).map(function(user){
+        return user.uid;
+      });
+
+
+      /* Create new acl instance */
+      var acl = Built.ACL();
+      aclUsers.forEach(function(userUID){
+        acl = acl.setUserReadAccess(userUID, true);
+        acl = acl.setUserUpdateAccess(userUID, true);
+        acl = acl.setUserDeleteAccess(userUID, true);
+      });
+
+
+      /* Remove Collaborator from UI */ 
+      task.collaborators = task.collaborators.filter(function(user){
+        if (user.get('uid') !== collaborator.get('uid')){
+          return user;
+        }
+      });
+
+      task
+        .setACL(acl)
+        .save()
+        .then(function(task){
+          $sa($scope, function(){
+            $scope.taskList.splice(index, 1, task);
+          })
+        }, function(error){
+          console.log('Error', error);
+        });
     }
 
   })
