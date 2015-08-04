@@ -33,21 +33,21 @@ angular.module('todoApp',['ngRoute'])
       ===================
       Fetch data from Built.io Backend's
     */
-    
-      // `BuiltClass` is an instance of Backend class. 
-      var BuiltClass = BuiltApp.Class('tasks');
-
-      // `builtQuery` is an instance of Backend's Query.
-      var builtQuery = BuiltClass.Query();
-
+      
       /* 
-        First get current user 
-        and then execute builtQuery 
+        First get current user and then execute builtQuery 
       */
       BuiltApp.User.getCurrentUser()
         .then(function(user){
           var uid = user.toJSON().uid;
-          builtQuery = builtQuery.where('app_user_object_uid', uid);
+          var authtoken = user.toJSON().authtoken;
+
+          // `BuiltClass` is an instance of Backend class. 
+          var BuiltClass = BuiltApp.setAuthToken(authtoken).Class('tasks');
+
+          // `builtQuery` is an instance of Backend's Query.
+          var builtQuery = BuiltClass.Query();
+
           builtQuery
             .exec()
             .then(function(data){
@@ -132,7 +132,6 @@ angular.module('todoApp',['ngRoute'])
     /* Edit task status */
     $scope.editTaskStatus = function(task){
       var index   = $scope.taskList.indexOf(task);
-      console.log('status', task.get('task_status'));
       var newTask = task.set('task_status',task.get('task_status'));
       $scope.updateTask(newTask, index);
     }
@@ -291,7 +290,6 @@ angular.module('todoApp',['ngRoute'])
           console.log('Error', error);
         });
     }
-
   })
   .controller('SignInController', function($scope, $location, $rootScope){
     /* Redirect to `todo` route when user is present */
