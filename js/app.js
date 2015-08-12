@@ -3,7 +3,7 @@ var BuiltApp       = Built.App('blta1d22ed99ebbf615');
 var EmployeeRoleID = 'blt49721667201bcec6';
 
 //Create `todoApp` AngularJS module added `ngRoute` as dependency
-angular.module('todoApp',['ngRoute'])
+angular.module('todoApp',['ngRoute','ngFileUpload'])
   .config(['$routeProvider','$locationProvider', function($routeProvider, $locationProvider){
     $routeProvider
       .when('/', {
@@ -23,7 +23,7 @@ angular.module('todoApp',['ngRoute'])
         controller  : 'GoogleLoginController'
       })
   }])
-  .controller('TodoListController', function($scope, $rootScope, $location, $timeout) {
+  .controller('TodoListController', function($scope, $rootScope, $location, $timeout, Upload) {
     $scope.taskList = [];
     $scope.collaborator = {
       email : ""
@@ -192,103 +192,133 @@ angular.module('todoApp',['ngRoute'])
         } else {
           $scope.taskList[index].showCollaborationBox = true;
         }
-    }
 
-    /* Add New Collaborator */
-    $scope.addCollaborator = function(task){
-      var index = $scope.taskList.indexOf(task);
-      var collaboratorEmail = $scope.collaborator.email;
 
-      if(collaboratorEmail){
-        var user    = BuiltApp.User();
-        var userUID = "";
-        var taskACL = undefined;
-        
-        user.fetchUserUidByEmail(collaboratorEmail)
-          .then(function(userObject){
-            userUID = userObject.get('uid');              
+      /* Add New Collaborator */
+      $scope.addCollaborator = function(task){
+        var index = $scope.taskList.indexOf(task);
+        var collaboratorEmail = $scope.collaborator.email;
 
-              /* 
-                Create instance of Built ACL
-                and set READ, UPDATE and DELETE permission to true
-              */
-              var acl = Built.ACL();
-                  acl = acl.setUserReadAccess(userUID, true);
-                  acl = acl.setUserUpdateAccess(userUID, true);
-                  acl = acl.setUserDeleteAccess(userUID, true);
+        if(collaboratorEmail){
+          var user    = BuiltApp.User();
+          var userUID = "";
+          var taskACL = undefined;
+          
+          user.fetchUserUidByEmail(collaboratorEmail)
+            .then(function(userObject){
+              userUID = userObject.get('uid');              
 
-              /* 
-                Get ACL of the object and push it in new acl instance 
-              */
-              if(task.get('ACL').users){
-                task.get('ACL').users.forEach(function(user){
-                  acl.data.users.push(user)
-                })
-              }
-              
-              /*
-                Apply ACL on a TASK and Save to Backend.
-              */
-              task = task.setACL(acl);
-              
-              task
-                .save()
-                .then(function(task){
-                  $sa($scope, function(){
-                    $scope.taskList.splice(index, 1, task);
+                /* 
+                  Create instance of Built ACL
+                  and set READ, UPDATE and DELETE permission to true
+                */
+                var acl = Built.ACL();
+                    acl = acl.setUserReadAccess(userUID, true);
+                    acl = acl.setUserUpdateAccess(userUID, true);
+                    acl = acl.setUserDeleteAccess(userUID, true);
+
+                /* 
+                  Get ACL of the object and push it in new acl instance 
+                */
+                if(task.get('ACL').users){
+                  task.get('ACL').users.forEach(function(user){
+                    acl.data.users.push(user)
                   })
-                  console.log('New Task With ACL', task);
-                }, function(error){
-                  console.log('Error', error);
-                })
+                }
+                
+                /*
+                  Apply ACL on a TASK and Save to Backend.
+                */
+                task = task.setACL(acl);
+                
+                task
+                  .save()
+                  .then(function(task){
+                    $sa($scope, function(){
+                      $scope.taskList.splice(index, 1, task);
+                    })
+                    console.log('New Task With ACL', task);
+                  }, function(error){
+                    console.log('Error', error);
+                  })
 
+            }, function(error){
+              console.log('Error', error);
+            })
+        }
+      }
+
+      /* Remove Collaborator */
+      $scope.removeCollaborator = function(task, collaborator){
+        var index = $scope.taskList.indexOf(task);
+
+        /* Get array of all users in ACL and remove current collaborator */
+        var aclUsers = task.get('ACL').users.filter(function(user){
+          if(user.uid !== collaborator.get('uid')){
+            return user.uid;
+          }
+        }).map(function(user){
+          return user.uid;
+        });
+
+
+        /* Create new acl instance */
+        var acl = Built.ACL();
+        aclUsers.forEach(function(userUID){
+          acl = acl.setUserReadAccess(userUID, true);
+          acl = acl.setUserUpdateAccess(userUID, true);
+          acl = acl.setUserDeleteAccess(userUID, true);
+        });
+
+        task
+          .setACL(acl)
+          .save()
+          .then(function(task){
+            $sa($scope, function(){
+              $scope.taskList.splice(index, 1, task);
+            })
           }, function(error){
             console.log('Error', error);
-          })
+          });
       }
+
     }
 
-    /* Remove Collaborator */
-    $scope.removeCollaborator = function(task, collaborator){
-      var index = $scope.taskList.indexOf(task);
-
-      /* Get array of all users in ACL and remove current collaborator */
-      var aclUsers = task.get('ACL').users.filter(function(user){
-        if(user.uid !== collaborator.get('uid')){
-          return user.uid;
-        }
-      }).map(function(user){
-        return user.uid;
-      });
-
-
-      /* Create new acl instance */
-      var acl = Built.ACL();
-      aclUsers.forEach(function(userUID){
-        acl = acl.setUserReadAccess(userUID, true);
-        acl = acl.setUserUpdateAccess(userUID, true);
-        acl = acl.setUserDeleteAccess(userUID, true);
-      });
-
-      task
-        .setACL(acl)
-        .save()
-        .then(function(task){
-          $sa($scope, function(){
-            $scope.taskList.splice(index, 1, task);
-          })
-        }, function(error){
-          console.log('Error', error);
-        });
-    }
+    
 
 
     /*************************************************
     * Show attachments added to current task
     *************************************************/
     $scope.showAttachmentsBox = function(task){
-      
+
+      var index = $scope.taskList.indexOf(task);
+      $scope.taskList.forEach(function(task){
+        delete task.showAttachmentsBox;
+      })
+
+      if($scope.taskList[index].showAttachmentsBox){
+        $scope.taskList[index].showAttachmentsBox = false;
+      } else {
+        $scope.taskList[index].showAttachmentsBox = true;
+      }
+
+      $scope.$watch('files', function () {
+        console.log('$scope.files', $scope.files);
+        $scope.upload($scope.files);
+      });
+
+
+    $scope.log = '';
+
+    $scope.upload = function (files) {
+      console.log('Files', files);
+      var upload = BuiltApp.Upload(files);
+      console.log('Upload', upload);
+    };
+
     }
+
   })
   .controller('SignInController', function($scope, $location, $rootScope){
     /* Redirect to `todo` route when user is present */

@@ -18,6 +18,9 @@
       <span class="action" ng-click="showCollaborationBox(task)">
         share
       </span>
+      <span class="action" ng-click="showAttachmentsBox(task)">
+        attachments
+      </span>
       <!-- Collaboration Box -->
       <div class="collaboration" ng-show="task.showCollaborationBox">
         <form ng-submit="addCollaborator(task)" ng-show="currentUser.get('uid') === task.get('app_user_object_uid')">
@@ -40,6 +43,10 @@
           <span class="text-center">No Collaborator</span>
         </div>
       </div><!-- /Collaboration Box -->
+      <!-- Attachments -->
+      <div class="attachments" ng-show="task.showAttachmentsBox">
+        <div class="button" ngf-select ngf-change="upload($files)" ngf-multiple="false">Select File</div>
+      </div>
     </li>
     <div>
     </div>

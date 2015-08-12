@@ -19,7 +19,7 @@ span {display:inline-block;}
 	list-style-type: none;
 }
 
-.collaboration{
+.collaboration, .attachments {
 	background: #EEEEEE;
 	width: 350px;
 	padding: 5px;
