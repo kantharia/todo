@@ -39,6 +39,7 @@ angular.module('todoApp',['ngRoute'])
       */
       BuiltApp.User.getCurrentUser()
         .then(function(user){
+          $scope.currentUser = user;
           var uid = user.toJSON().uid;
           var authtoken = user.toJSON().authtoken;
 
@@ -175,7 +176,6 @@ angular.module('todoApp',['ngRoute'])
                   })
               });  
         }
-        console.log('collaborators', $scope.taskList);
       }
 
 
@@ -206,7 +206,6 @@ angular.module('todoApp',['ngRoute'])
         
         user.fetchUserUidByEmail(collaboratorEmail)
           .then(function(userObject){
-
             userUID = userObject.get('uid');              
 
               /* 
@@ -271,14 +270,6 @@ angular.module('todoApp',['ngRoute'])
         acl = acl.setUserDeleteAccess(userUID, true);
       });
 
-
-      /* Remove Collaborator from UI */ 
-      task.collaborators = task.collaborators.filter(function(user){
-        if (user.get('uid') !== collaborator.get('uid')){
-          return user;
-        }
-      });
-
       task
         .setACL(acl)
         .save()
@@ -289,6 +280,14 @@ angular.module('todoApp',['ngRoute'])
         }, function(error){
           console.log('Error', error);
         });
+    }
+
+
+    /*************************************************
+    * Show attachments added to current task
+    *************************************************/
+    $scope.showAttachmentsBox = function(task){
+      
     }
   })
   .controller('SignInController', function($scope, $location, $rootScope){
@@ -477,6 +476,7 @@ angular.module('todoApp',['ngRoute'])
       */
       BuiltApp.User.getCurrentUser()
         .then(function(data){
+          $rootScope.currentUser = data;
           $sa($rootScope, function(){
             $rootScope.setUser(data.toJSON());
             $location.path('/todo');

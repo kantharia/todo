@@ -1,6 +1,6 @@
 <div ng-controller="TodoListController">
   <div>
-    <button ng-click="logout()">Logout</button>
+    {{currentUser.get('email')}} <button ng-click="logout()">Logout</button>
   </div> 
   <hr>
   <!-- Form to create new todo -->
@@ -15,10 +15,12 @@
       <span class="done-{{task.toJSON().task_status}}">{{task.toJSON().task_text}}</span>
       <span class="action" ng-click="removeTask(task)">delete</span>
       <span class="action" ng-click="editTaskText(task)">edit</span>
-      <span class="action" ng-click="showCollaborationBox(task)">share</span>
+      <span class="action" ng-click="showCollaborationBox(task)">
+        share
+      </span>
       <!-- Collaboration Box -->
       <div class="collaboration" ng-show="task.showCollaborationBox">
-        <form ng-submit="addCollaborator(task)">
+        <form ng-submit="addCollaborator(task)" ng-show="currentUser.get('uid') === task.get('app_user_object_uid')">
           Share Task With
           <input type="text" ng-model="collaborator.email" placeholder="Email ID of Collaborator"> 
           <button class="btn-small" type="submit">+</button>
@@ -27,9 +29,15 @@
         <div ng-show="task.collaborators">
           <ul>
             <li ng-repeat="collaborator in task.collaborators">
-              {{collaborator.get('email')}} - <span class="action" ng-click="removeCollaborator(task, collaborator)">remove</span>
+              {{collaborator.get('email')}}
+              <span class="action" ng-click="removeCollaborator(task, collaborator)"
+                ng-show="currentUser.get('uid') === task.get('app_user_object_uid')"
+              >remove</span>
             </li>
           </ul>
+        </div>
+        <div ng-hide="task.collaborators">
+          <span class="text-center">No Collaborator</span>
         </div>
       </div><!-- /Collaboration Box -->
     </li>
