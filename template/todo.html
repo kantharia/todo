@@ -45,7 +45,16 @@
       </div><!-- /Collaboration Box -->
       <!-- Attachments -->
       <div class="attachments" ng-show="task.showAttachmentsBox">
-        <div class="button" ngf-select ngf-change="upload($files)" ngf-multiple="false">Select File</div>
+        <form ng-submit="uploadAttachment(task)">
+          <input type="file" class="input-file">
+          <button type="submit">add</button>
+        </form>
+        <ul class="unstyled">
+          <li ng-repeat="file in task.data.attachments">
+            <span class="action" ng-click="removeAttachment(task, file)">x</span>
+            <a ng-click="downloadAttachment(file)">{{file.filename}}</a>
+          </li>
+        </ul>
       </div>
     </li>
     <div>

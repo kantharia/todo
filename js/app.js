@@ -303,19 +303,86 @@ angular.module('todoApp',['ngRoute','ngFileUpload'])
         $scope.taskList[index].showAttachmentsBox = true;
       }
 
-      $scope.$watch('files', function () {
-        console.log('$scope.files', $scope.files);
-        $scope.upload($scope.files);
-      });
+      $scope.uploadAttachment = function(task){
+        var index     = $scope.taskList.indexOf(task);
+        var inputFile = document.getElementsByClassName('input-file');
+        var fileName  = '';
 
 
-    $scope.log = '';
+        console.log('InputFile', inputFile.value);
 
-    $scope.upload = function (files) {
-      console.log('Files', files);
-      var upload = BuiltApp.Upload(files);
-      console.log('Upload', upload);
-    };
+        
+        //Get Current Filename
+        for(index in inputFile){
+          if(inputFile[index].value){
+            fileName = inputFile[index];
+          }
+        }
+        
+        var upload = BuiltApp.Upload();
+            upload = upload.setFile(fileName);
+
+        upload
+          .save()
+          .then(function(file){
+
+            //Get all the list of attachments
+            var files = task.get('attachments') || [];
+                files = files.map(function(file){
+                  delete file.$$hashKey;
+                  return file;
+                })
+                files.push(file);
+            task = task.set('attachments', files);
+
+            task
+              .save()
+              .then(function(data){
+                //Update DOM
+                $sa($scope, function(){
+                  $scope.taskList.splice(index,1,data);
+                })
+                /* Reset Input Form Field */
+                for(index in inputFile){
+                  inputFile[index].value = '';
+                }
+              })
+          })
+      }
+
+      $scope.downloadAttachment = function(file){
+        var upload = BuiltApp.Upload(file.uid);
+        upload
+          .fetch()
+          .then(function(file){
+            /* Append AUTHTOKEN as params to URL*/
+            file.params.url += '?AUTHTOKEN='+$scope.currentUser.get('authtoken');
+            file.download();
+          });
+        return false;
+      }
+
+      $scope.removeAttachment = function(task, file){
+        var attachments = task.get('attachments');
+
+        //Update Attachments 
+        attachments = attachments.filter(function(attachment){
+          if(attachment.uid !== file.uid){
+            return attachment;
+          }
+        });
+
+        var upload = BuiltApp.Upload(file.uid)
+            upload
+              .delete()
+              .then(function(){
+                $sa($scope, function(){
+                  task.set('attachments', attachments);
+                })
+              });
+        console.log('Task', attachments);
+        console.log('File to be removed', file);
+      }
 
     }
 
