@@ -185,6 +185,7 @@ angular.module('todoApp',['ngRoute','ngFileUpload'])
         $scope.collaborator.email = "";
         $scope.taskList.forEach(function(task){
           delete task.showCollaborationBox;
+          delete task.showAttachmentsBox;
         })
 
         if($scope.taskList[index].showCollaborationBox){
@@ -284,16 +285,13 @@ angular.module('todoApp',['ngRoute','ngFileUpload'])
 
     }
 
-    
-
-
     /*************************************************
     * Show attachments added to current task
     *************************************************/
     $scope.showAttachmentsBox = function(task){
-
       var index = $scope.taskList.indexOf(task);
       $scope.taskList.forEach(function(task){
+        delete task.showCollaborationBox;
         delete task.showAttachmentsBox;
       })
 
@@ -304,18 +302,14 @@ angular.module('todoApp',['ngRoute','ngFileUpload'])
       }
 
       $scope.uploadAttachment = function(task){
-        var index     = $scope.taskList.indexOf(task);
-        var inputFile = document.getElementsByClassName('input-file');
-        var fileName  = '';
+        var index             = $scope.taskList.indexOf(task);
+        var inputFileElements = document.getElementsByClassName('input-file');
+        var fileName          = '';
 
-
-        console.log('InputFile', inputFile.value);
-
-        
         //Get Current Filename
-        for(index in inputFile){
-          if(inputFile[index].value){
-            fileName = inputFile[index];
+        for(var i in inputFileElements){
+          if(inputFileElements[i].value){
+            fileName = inputFileElements[i];
           }
         }
         
@@ -332,7 +326,8 @@ angular.module('todoApp',['ngRoute','ngFileUpload'])
                   delete file.$$hashKey;
                   return file;
                 })
-                files.push(file);
+            files.push(file);
+            
             task = task.set('attachments', files);
 
             task
@@ -342,14 +337,11 @@ angular.module('todoApp',['ngRoute','ngFileUpload'])
                 $sa($scope, function(){
                   $scope.taskList.splice(index,1,data);
                 })
-                /* Reset Input Form Field */
-                for(index in inputFile){
-                  inputFile[index].value = '';
-                }
               })
           })
       }
 
+      //Download Attachment
       $scope.downloadAttachment = function(file){
         var upload = BuiltApp.Upload(file.uid);
         upload
@@ -362,7 +354,9 @@ angular.module('todoApp',['ngRoute','ngFileUpload'])
         return false;
       }
 
+      //Delete Attachments
       $scope.removeAttachment = function(task, file){
+        var index       = $scope.taskList.indexOf(task);
         var attachments = task.get('attachments');
 
         //Update Attachments 
@@ -376,10 +370,14 @@ angular.module('todoApp',['ngRoute','ngFileUpload'])
             upload
               .delete()
               .then(function(){
-                $sa($scope, function(){
-                  task.set('attachments', attachments);
-                })
+                
               });
+
+        $sa($scope, function(){
+          task = task.set('attachments', attachments);
+          $scope.taskList.splice(index,1,task);
+        })
+
         console.log('Task', attachments);
         console.log('File to be removed', file);
       }
