@@ -3,7 +3,7 @@ var BuiltApp       = Built.App('blta1d22ed99ebbf615');
 var EmployeeRoleID = 'blt49721667201bcec6';
 
 //Create `todoApp` AngularJS module added `ngRoute` as dependency
-angular.module('todoApp',['ngRoute','ngFileUpload'])
+angular.module('todoApp',['ngRoute'])
   .config(['$routeProvider','$locationProvider', function($routeProvider, $locationProvider){
     $routeProvider
       .when('/', {
@@ -23,7 +23,7 @@ angular.module('todoApp',['ngRoute','ngFileUpload'])
         controller  : 'GoogleLoginController'
       })
   }])
-  .controller('TodoListController', function($scope, $rootScope, $location, $timeout, Upload) {
+  .controller('TodoListController', function($scope, $rootScope, $location, $timeout) {
     $scope.taskList = [];
     $scope.collaborator = {
       email : ""
