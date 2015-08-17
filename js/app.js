@@ -304,17 +304,17 @@ angular.module('todoApp',['ngRoute'])
       $scope.uploadAttachment = function(task){
         var index             = $scope.taskList.indexOf(task);
         var inputFileElements = document.getElementsByClassName('input-file');
-        var fileName          = '';
+        var inputFileElement  = '';
 
-        //Get Current Filename
+        //Get Current fileElement
         for(var i in inputFileElements){
           if(inputFileElements[i].value){
-            fileName = inputFileElements[i];
+            inputFileElement = inputFileElements[i];
           }
         }
         
         var upload = BuiltApp.Upload();
-            upload = upload.setFile(fileName);
+            upload = upload.setFile(inputFileElement);
 
         upload
           .save()
@@ -355,7 +355,7 @@ angular.module('todoApp',['ngRoute'])
       }
 
       //Delete Attachments
-      $scope.removeAttachment = function(task, file){
+      $scope.deleteAttachment = function(task, file){
         var index       = $scope.taskList.indexOf(task);
         var attachments = task.get('attachments');
 
@@ -377,11 +377,7 @@ angular.module('todoApp',['ngRoute'])
           task = task.set('attachments', attachments);
           $scope.taskList.splice(index,1,task);
         })
-
-        console.log('Task', attachments);
-        console.log('File to be removed', file);
       }
-
     }
 
   })
@@ -585,3 +581,4 @@ angular.module('todoApp',['ngRoute'])
 function $sa(scope, fn) {
   (scope.$$phase || scope.$root.$$phase) ? fn() : scope.$apply(fn);
 }
+

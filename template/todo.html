@@ -51,7 +51,7 @@
         </form>
         <ul class="unstyled">
           <li ng-repeat="file in task.data.attachments">
-            <span class="action" ng-click="removeAttachment(task, file)">x</span>
+            <span class="action" ng-click="deleteAttachment(task, file)">x</span>
             <a ng-click="downloadAttachment(file)">{{file.filename}}</a>
           </li>
         </ul>
