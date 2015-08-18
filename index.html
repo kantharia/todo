@@ -10,6 +10,8 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <!-- Latest compiled and minified JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <!-- Fontawesome -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 
   <script type="text/javascript" src="js/built.min.js"></script>
   <script type="text/javascript" src="js/angular.min.js"></script>
@@ -20,11 +22,12 @@
 <body>
   <nav class="navbar navbar-default">
     <div class="navbar-header">
-      <a class="navbar-brand" href="#">Tohdo</a>
+      <a class="navbar-brand" href="/#/">Tohdo</a>
     </div>
   </nav>
-  <hr>
   <!-- Rendering Tempalte -->
-  <div ng-view></div>
+  <div class="container">
+    <div ng-view></div>
+  </div>
 </body>
 </html>

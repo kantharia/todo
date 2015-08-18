@@ -1,15 +1,24 @@
 <div ng-controller="TodoListController">
-  <div>
-    {{currentUser.get('email')}} <button ng-click="logout()">Logout</button>
-  </div> 
-  <hr>
+  <div class="text-right">
+    {{currentUser.get('email')}}
+    <button ng-click="logout()" class="btn btn-link">
+      Logout <i class="fa fa-sign-out"></i>
+    </button>
+  </div>
+
   <!-- Form to create new todo -->
   <form ng-submit="addTask()">
-    <input type="text" ng-model="taskText" size="30" placeholder="add new todo here">
-    <input class="btn-primary" type="submit" value="add">
+    <div class="input-group">
+      <input class="form-control" type="text" ng-model="taskText" size="30" placeholder="add new todo here">
+      <span class="input-group-btn">
+        <button class="btn btn-success" type="submit">
+          <i class="fa fa-plus"></i>
+        </button>
+      </span>
+    </div>
   </form>
   <!-- Todo list -->
-  <ul class="unstyled">
+  <ul class="list-unstyled">
     <li ng-repeat="task in taskList">
       <input type="checkbox" ng-model="task.toJSON().task_status" ng-click="editTaskStatus(task)">
       <span class="done-{{task.toJSON().task_status}}">{{task.toJSON().task_text}}</span>
@@ -23,19 +32,28 @@
       </span>
       <!-- Collaboration Box -->
       <div class="collaboration" ng-show="task.showCollaborationBox">
-        <form ng-submit="addCollaborator(task)" ng-show="currentUser.get('uid') === task.get('app_user_object_uid')">
-          Share Task With
-          <input type="text" ng-model="collaborator.email" placeholder="Email ID of Collaborator"> 
-          <button class="btn-small" type="submit">+</button>
+        <form class="attachment-form" ng-submit="addCollaborator(task)" ng-show="currentUser.get('uid') === task.get('app_user_object_uid')">
+          <div class="input-group">
+            <input class="form-control input-sm" type="text" ng-model="collaborator.email" placeholder="Share task with user (email id)."> 
+            <span class="input-group-btn">
+              <button class="btn btn-success btn-sm" type="submit">
+                Add Collaborator
+              </button>
+            </span>
+          </div>
         </form>
         <!-- Collaborators List -->
         <div ng-show="task.collaborators">
-          <ul>
+          <ul class="list-unstyled attachments-list">
             <li ng-repeat="collaborator in task.collaborators">
+              <span 
+                class="action" 
+                ng-click="removeCollaborator(task, collaborator)"
+                ng-show="currentUser.get('uid') === task.get('app_user_object_uid')" 
+              >
+                <i class="fa fa-trash-o"></i>
+              </span>
               {{collaborator.get('email')}}
-              <span class="action" ng-click="removeCollaborator(task, collaborator)"
-                ng-show="currentUser.get('uid') === task.get('app_user_object_uid')"
-              >remove</span>
             </li>
           </ul>
         </div>
@@ -45,13 +63,17 @@
       </div><!-- /Collaboration Box -->
       <!-- Attachments -->
       <div class="attachments" ng-show="task.showAttachmentsBox">
-        <form ng-submit="uploadAttachment(task)">
+        <form ng-submit="uploadAttachment(task)" class="attachment-form">
           <input type="file" class="input-file">
-          <button type="submit">add</button>
+          <button type="submit" class="btn btn-xs btn-default">
+            <i class="fa fa-upload"></i> Upload
+          </button>
         </form>
-        <ul class="unstyled">
+        <ul class="list-unstyled attachments-list">
           <li ng-repeat="file in task.data.attachments">
-            <span class="action" ng-click="deleteAttachment(task, file)">x</span>
+            <span class="action" ng-click="deleteAttachment(task, file)">
+              <i class="fa fa-trash-o"></i>
+            </span>
             <a ng-click="downloadAttachment(file)">{{file.filename}}</a>
           </li>
         </ul>

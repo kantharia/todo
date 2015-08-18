@@ -19,13 +19,37 @@ span {display:inline-block;}
 	list-style-type: none;
 }
 
-.collaboration, .attachments {
-	background: #EEEEEE;
-	width: 350px;
-	padding: 5px;
+.collaboration {
+	margin-bottom: 5px;
+	display: block;
+	border:1px solid #EEEEEE;
+}
+
+.attachments {
+	margin-bottom: 5px;
+	display: block;
+	border: 1px solid #EEEEEE;
 }
 
 .text-center {
 	text-align: center;
 	display: block;
+}
+
+.bg-red{
+	background-color: red;
+}
+
+/* Input Type File */
+input[type=file] {
+  display: inline-block;
+}
+
+.attachment-form{
+	padding: 5px;
+  background-color: #E1E1E1;
+}
+
+.attachments-list{
+	padding: 5px;
 }
