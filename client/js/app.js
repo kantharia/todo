@@ -93,6 +93,10 @@ angular.module('todoApp',['ngRoute'])
               $scope.taskText = '';
             })
           })
+          .catch(function(error){
+            //Show error in alert
+            alert(error.entity.error_message)
+          })
     }
 
     /* Delete task */
@@ -379,7 +383,6 @@ angular.module('todoApp',['ngRoute'])
         })
       }
     }
-
   })
   .controller('SignInController', function($scope, $location, $rootScope){
     /* Redirect to `todo` route when user is present */
